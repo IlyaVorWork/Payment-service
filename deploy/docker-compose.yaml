@@ -1,0 +1,32 @@
+services:
+
+  server:
+    build:
+      context: ../
+      dockerfile: build/docker/service/Dockerfile
+    container_name: payment_service
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - ${SERVICE_PORT}:${SERVICE_PORT}
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: payment_pg
+    build:
+      context: ../build/docker/db
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    volumes:
+      - pgs_payment_volume:/var/lib/postgresql/data
+    ports:
+      - "5612:5432"
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+
+volumes:
+  pgs_payment_volume:

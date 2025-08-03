@@ -145,6 +145,6 @@ API возвращает читаемые сообщения об ошибках
 
 ```json
 {
-  "error": "wallet with provided address does not exist",
+  "error": "wallet with provided address does not exist"
 }
 ```

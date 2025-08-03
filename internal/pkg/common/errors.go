@@ -47,9 +47,9 @@ func getErrorCodesMap() map[string]int {
 	codeMap[CountNotProvidedErr.Error()] = http.StatusBadRequest
 	codeMap[CountNaNErr.Error()] = http.StatusBadRequest
 	codeMap[InsufficientFundsErr.Error()] = http.StatusBadRequest
-	codeMap[fmt.Sprintf(WalletNotExistsErr.Error(), "'from'")] = http.StatusBadRequest
-	codeMap[fmt.Sprintf(WalletNotExistsErr.Error(), "'to'")] = http.StatusBadRequest
-	codeMap[fmt.Sprintf(WalletNotExistsErr.Error(), "")] = http.StatusBadRequest
+	codeMap[fmt.Sprintf(WalletNotExistsErr.Error(), "'from'")] = http.StatusNotFound
+	codeMap[fmt.Sprintf(WalletNotExistsErr.Error(), "'to'")] = http.StatusNotFound
+	codeMap[fmt.Sprintf(WalletNotExistsErr.Error(), "")] = http.StatusNotFound
 
 	return codeMap
 }

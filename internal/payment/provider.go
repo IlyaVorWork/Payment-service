@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// PostgresRepository представляет собой слой взаимодействия с Postgres
 type PostgresRepository struct {
 	db *sql.DB
 }

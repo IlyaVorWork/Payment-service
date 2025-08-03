@@ -14,6 +14,7 @@ type IService interface {
 	GetBalance(address string) (float64, error)
 }
 
+// Handler представляет собой слой обработчиков HTTP-запросов
 type Handler struct {
 	service IService
 }
@@ -24,55 +25,79 @@ func NewHandler(service IService) *Handler {
 	}
 }
 
+// MakeTransaction [POST] /api/send
+// Получает в теле запроса данные MakeTransactionDTO
+// Ответы:
+// 200 - В случае успеха
+// 400 - В случае предоставления неверных входных данных или недостатка баланса
+// 500 - В случае ошибки со стороны сервера
 func (handler *Handler) MakeTransaction(c *gin.Context) {
 
 	var dto MakeTransactionDTO
 	if err := json.NewDecoder(c.Request.Body).Decode(&dto); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		_ = c.Error(err)
 		return
 	}
 
 	err := handler.service.MakeTransaction(dto.From, dto.To, dto.Amount)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		_ = c.Error(err)
 		return
 	}
 
 	c.Status(http.StatusOK)
 }
 
+// GetLastTransactions [GET] /api/transactions?count=N
+// Получает в параметрах запроса count - число записей, которое необходимо вернуть
+// Ответы:
+// 200 - В случае успеха, возвращает данные GetLastTransactionsOut
+// 400 - В случае отсутствия параметра count или его неверного формата
+// 500 - В случае ошибки со стороны сервера
 func (handler *Handler) GetLastTransactions(c *gin.Context) {
 
 	countString := c.Query("count")
 	if countString == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": common.CountNotProvidedErr.Error()})
+		_ = c.Error(common.CountNotProvidedErr)
 		return
 	}
 
 	count, err := strconv.Atoi(countString)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": common.CountNaNErr.Error()})
+		_ = c.Error(common.CountNaNErr)
 		return
 	}
 
 	transactions, err := handler.service.GetLastTransactions(count)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		_ = c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
+	out := GetLastTransactionsOut{
+		Transactions: transactions,
+	}
+	c.JSON(http.StatusOK, out)
 }
 
+// GetBalance [GET] /api/wallet/:address/balance
+// Получает в адресе запроса address - адрес кошелька, баланс которого необходимо вернуть
+// Ответы:
+// 200 - В случае успеха, возвращает данные GetBalanceOut
+// 400 - В случае отсутствия параметра count или его неверного формата
+// 500 - В случае ошибки со стороны сервера
 func (handler *Handler) GetBalance(c *gin.Context) {
 
 	address := c.Param("address")
 
 	balance, err := handler.service.GetBalance(address)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		_ = c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"balance": balance})
+	out := GetBalanceOut{
+		Balance: balance,
+	}
+	c.JSON(http.StatusOK, out)
 }

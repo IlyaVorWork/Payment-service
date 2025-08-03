@@ -13,6 +13,7 @@ type IProvider interface {
 	GetBalance(address string) (float64, error)
 }
 
+// Service представляет собой слой бизнес-логики
 type Service struct {
 	provider IProvider
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"payment_service/internal/payment"
+	"payment_service/internal/pkg/common"
 	"payment_service/internal/pkg/postgres"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,7 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Recovery())
+	router.Use(common.NewErrorHandler())
 
 	postgresRepo := payment.NewPostgresRepository(postgresDB)
 	service := payment.NewService(postgresRepo)

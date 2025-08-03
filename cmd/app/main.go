@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("deploy_server/.env")
+	err := godotenv.Load("deploy/.env")
 	if err != nil {
 		log.Fatalf("cannot open .env file: %sv", err)
 	}
@@ -31,19 +31,13 @@ func main() {
 
 	postgresRepo := payment.NewPostgresRepository(postgresDB)
 	service := payment.NewService(postgresRepo)
-	payment.NewHandler(service)
+	handler := payment.NewHandler(service)
 
 	apiRouter := router.Group("/api")
 	{
-		apiRouter.POST("/send", func(context *gin.Context) {
-			panic("not implemented")
-		})
-		apiRouter.GET("/transactions", func(context *gin.Context) {
-			panic("not implemented")
-		})
-		apiRouter.GET("/wallet/:address/balance", func(context *gin.Context) {
-			panic("not implemented")
-		})
+		apiRouter.POST("/send", handler.MakeTransaction)
+		apiRouter.GET("/transactions", handler.GetLastTransactions)
+		apiRouter.GET("/wallet/:address/balance", handler.GetBalance)
 	}
 
 	addr := ":" + os.Getenv("SERVICE_PORT")

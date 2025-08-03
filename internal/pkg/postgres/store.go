@@ -16,7 +16,7 @@ func OpenPostgresDB(connURL string) (*sql.DB, func(db *sql.DB), error) {
 		return nil, nil, err
 	}
 
-	return db, closePostgresDb, nil
+	return db, closePostgresDB, nil
 }
 
 func closePostgresDB(db *sql.DB) {
